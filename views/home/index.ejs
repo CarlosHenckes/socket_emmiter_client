@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html ng-app="mytime">
+
+<head>
+    <title>remote socket listener</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        var app = angular.module('mytime', []);
+        var io = io.connect('http://localhost:3001'); //https://rodadafortuna.herokuapp.com/
+        
+        io.on('connect', function () {
+            console.log('on connection triggered!');
+        });
+
+        app.controller('tim', ['$scope', function ($scope) {
+            io.on('emissor', function (leitura) {
+                //var date = new Date(leitura);
+                sortear();
+                console.log('comando: ' + leitura);
+                $('#tm').html(leitura);
+            });
+        }]);
+
+        function sortear(){
+            $.ajax({
+                url: '/sortear',
+                type: 'GET',
+                dataType: 'jsonp',
+                success: function(data){
+                    console.log(data);
+                }
+            });
+        }
+
+        function reply() {
+            $.ajax({
+                url: 'http://localhost:3001/result/green',
+                type: 'GET',
+                dataType: 'jsonp',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>remote socket listener</h1>
+    <div ng-controller="tim">
+        <span id="tm"></span>
+        <br>
+        <button onclick="reply();">reply</button>
+    </div>
+</body>
+
+</html>
